@@ -9,6 +9,7 @@ import {
 	linkWithCredential,
 	fetchSignInMethodsForEmail,
 	onAuthStateChanged,
+	sendEmailVerification,
 } from "firebase/auth";
 import {
 	getFirestore,
@@ -50,6 +51,8 @@ export const verifyUserOtp = async (userInfo) => {
 			console.error("Error in udpating additional userInfo: ", error);
 		});
 
+	sendEmailVerification(auth.currentUser).then(() => {});
+
 	// Save user Info in users collection
 	return await createUserFromAuth(user, email, additionalInfo);
 };
@@ -57,7 +60,6 @@ export const verifyUserOtp = async (userInfo) => {
 export const signUpUser = async (phoneNumber, email) => {
 	let appVerifier = window.recaptchaVerifier;
 
-	// TODO: Verify email or use signInWithPopup
 	const emailSignIn = await fetchSignInMethodsForEmail(auth, email);
 	if (emailSignIn && emailSignIn.length > 0)
 		throw new Error("Email already Exists!, please Sign-In");

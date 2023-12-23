@@ -172,11 +172,20 @@ const UserDashboard = () => {
 							<ListItem disablePadding>
 								<ListItemButton>
 									<ListItemIcon>
-										<EmailIcon color="error" />
+										<EmailIcon
+											color={currentUser.emailVerified ? "success" : "error"}
+										/>
 									</ListItemIcon>
 									<ListItemText
-										primary="Email not verified"
-										secondary="Please check your inbox for verification link"
+										primary={
+											currentUser.emailVerified
+												? "Email verified"
+												: "Email not verified"
+										}
+										secondary={
+											!currentUser.emailVerified &&
+											"Please check your inbox for verification link"
+										}
 									/>
 									<ListItemIcon>
 										<PriorityHighIcon fontSize="small" />
