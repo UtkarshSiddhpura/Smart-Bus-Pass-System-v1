@@ -37,6 +37,9 @@ export const theme = createTheme({
 					"& .MuiInputBase-input::placeholder": {
 						opacity: .7,
 					},
+					"& .MuiInputBase-input.Mui-disabled": {
+						WebkitTextFillColor: "rgba(0, 0, 0, 0.60)" 
+					}
 				},
 			},
 		},

@@ -14,10 +14,20 @@ import {
 import {
 	getFirestore,
 	doc,
+	collection,
 	getDoc,
+	getDocs,
 	setDoc,
+	addDoc,
+	updateDoc,
 	limitToLast,
 } from "firebase/firestore";
+import {
+	getStorage,
+	ref,
+	uploadBytesResumable,
+	getDownloadURL,
+} from "firebase/storage";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyDOaa608aTROn9KRUzlzcBv2WHxeNs3JYg",
@@ -32,6 +42,7 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 
 const auth = getAuth();
+const storage = getStorage();
 
 export const verifyUserOtp = async (userInfo) => {
 	const { email, password, otp, ...additionalInfo } = userInfo;
@@ -117,6 +128,44 @@ export const getCurrentUserData = async () => {
 	const userDocRef = doc(db, "users", auth.currentUser.uid);
 	const userSnapshot = await getDoc(userDocRef);
 	return userSnapshot.data();
+};
+
+// TODO check for unnecessary network Request
+export const getCurrentUserPasses = async () => {
+	if (!auth.currentUser) return;
+	const busPassesColRef = collection(
+		doc(db, "users", auth.currentUser.uid),
+		"busPasses"
+	);
+	const querySnapshot = await getDocs(busPassesColRef);
+	const passes = querySnapshot.docs.map((doc) => ({
+		id: doc.id,
+		...doc.data(),
+	}));
+	return passes;
+};
+
+// TODO Error Handling / Promise.all
+export const updateCurrentUserData = async (userData, userFiles) => {
+	const userDocRef = doc(db, "users", auth.currentUser.uid);
+	Object.keys(userFiles).forEach((key) => {
+		const file = userFiles[key];
+		const metadata = {
+			contentType: file.type,
+			user: auth.currentUser.uid,
+		};
+		const storageRef = ref(storage, `images/${key}/${file.name}`);
+		uploadBytesResumable(storageRef, file, metadata);
+		// getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+		// 	fileUrls[key + "Url"] = downloadURL;
+		// });
+	});
+	return await updateDoc(userDocRef, userData);
+};
+export const generateNewPass = async (passData) => {
+	const userDocRef = doc(db, "users", auth.currentUser.uid);
+	const busPassesColRef = collection(userDocRef, "busPasses");
+	return await addDoc(busPassesColRef, passData);
 };
 
 export const signInUserFromEmailFromAuth = async (email, password) => {

@@ -1,6 +1,8 @@
 import Navigation from "./components/Navigation.component";
 import SignInForm from "./routes/sign-in-form/sign-in-form.component";
 import UserDashboard from "./routes/user-dashboard/user-dashboard.component";
+import UserPasses from "./routes/user-dashboard/user-passes.component";
+import RenewPass from "./routes/user-dashboard/renew-pass";
 import IssuePassForm from "./routes/issue-pass/issue-pass.component";
 import App from "@/App";
 
@@ -10,7 +12,6 @@ import {
 	redirect,
 } from "react-router-dom";
 
-// not a good idea to put inside the Router component
 const router = createBrowserRouter([
 	{
 		path: "/",
@@ -23,7 +24,11 @@ const router = createBrowserRouter([
 	{
 		path: "/dashboard",
 		element: <Navigation />,
-		children: [{ index: true, element: <UserDashboard /> }],
+		children: [
+			{ index: true, element: <UserDashboard /> },
+			{ path: "/dashboard/passes", element: <UserPasses /> },
+			{ path: "/dashboard/renew", element: <RenewPass /> },
+		],
 		// TODO auth to be handled
 	},
 	{

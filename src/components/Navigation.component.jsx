@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { signOutUser } from "../utils/firebase/firebase.utils";
 
 import AppBar from "@mui/material/AppBar";
@@ -29,31 +29,36 @@ const pages = [
 	{
 		name: "Home",
 		icon: <HomeRoundedIcon sx={iconStyles} />,
+		to: "",
 	},
 	{
 		name: "My Passes",
 		icon: <CardIcon sx={iconStyles} />,
+		to: "/passes",
 	},
 	{
 		name: "Pass Renewal",
-		icon: (
-			<Badge badgeContent={0} color="secondary">
-				<AutorenewIcon />
-			</Badge>
-		),
+		icon: <AutorenewIcon />,
+		to: "/renew",
 	},
 ];
 export default function Navigation() {
 	const navigate = useNavigate();
 	const [anchorElNav, setAnchorElNav] = useState(null);
 	const [anchorElUser, setAnchorElUser] = useState(null);
-	const [tab, setTab] = useState(0); //TODO https://mui.com/material-ui/guides/routing/#react-router-examples
+
+	//TODO https:	//mui.com/material-ui/guides/routing/#react-router-examples
+	const [tab, setTab] = useState(0);
+	const location = useLocation();
+	useEffect(() => {
+		const path = location.pathname.split("/")[2];
+		setTab(pages.findIndex((page) => page.to.substring(1) === path));
+	}, [location]);
 
 	const signOut = async () => {
 		await signOutUser();
 		navigate("/sign-in");
 	};
-
 	const settings = [
 		{
 			name: "Edit Profile",
@@ -174,9 +179,10 @@ export default function Navigation() {
 					>
 						{pages.map((page) => (
 							<Tab
+								component={Link}
+								to={"/dashboard" + page.to + "/"}
 								key={page.name}
 								icon={page.icon}
-								onClick={handleCloseNavMenu}
 								iconPosition="start"
 								label={page.name}
 								color="secondary"
